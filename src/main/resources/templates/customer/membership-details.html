@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle}">My Membership</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+	<nav th:fragment="customer_navbar" class="navbar navbar-expand-lg navbar-dark bg-info">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="/customer/dashboard">Basketball Club</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+					data-bs-target="#customerNavbarContent" aria-controls="customerNavbarContent" aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="customerNavbarContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" th:href="@{/customer/dashboard}">
+								<i class="fas fa-home me-1"></i> Dashboard
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customer/tickets}">
+								<i class="fas fa-ticket-alt me-1"></i> My Tickets
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customer/merchandise}">
+								<i class="fas fa-tshirt me-1"></i> Merchandise
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customer/schedule}">
+								<i class="fas fa-calendar-alt me-1"></i> Schedule
+							</a>
+						</li>
+						
+						<li class="nav-item">
+												<a class="nav-link" th:href="@{/customer/news}">
+													<i class="fas fa-newspaper me-1"></i> News
+												</a>
+											</li>
+					</ul>
+					<ul class="navbar-nav ms-auto">
+						<li class="nav-item dropdown" th:if="${currentUser != null}">
+							<a class="nav-link dropdown-toggle" href="#" id="customerNavbarDropdown" role="button"
+								data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="fas fa-user-circle me-1"></i>
+								<span th:text="${currentUser.username}"></span>
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="customerNavbarDropdown">
+								<li><a class="dropdown-item" th:href="@{/customer/profile}">
+										<i class="fas fa-user me-1"></i> Profile
+									</a></li>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
+								<li><a class="dropdown-item" th:href="@{/logout}">
+										<i class="fas fa-sign-out-alt me-1"></i> Logout
+									</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+	<div class="container mt-4">
+		<div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${param.success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		<div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${param.error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+
+		<h2><i class="fas fa-star me-2"></i>My Membership</h2>
+		<p class="lead">Details about your active membership.</p>
+
+		<div th:if="${activeMembership != null}" class="row mt-4">
+			<div class="col-lg-8">
+				<div class="card">
+					<div class="card-header bg-info text-white">
+						<h5 class="mb-0">Membership Information</h5>
+					</div>
+					<div class="card-body">
+						<dl class="row">
+							<dt class="col-sm-3">Membership Type:</dt>
+							<dd class="col-sm-9"><span
+									th:text="${activeMembership.membershipType.name().replace('_', ' ')}"></span></dd>
+
+							<dt class="col-sm-3">Start Date:</dt>
+							<dd class="col-sm-9"><span
+									th:text="${#temporals.format(activeMembership.startDate, 'MMM dd, yyyy')}"></span>
+							</dd>
+
+							<dt class="col-sm-3">End Date:</dt>
+							<dd class="col-sm-9"><span
+									th:text="${#temporals.format(activeMembership.endDate, 'MMM dd, yyyy')}"></span>
+							</dd>
+
+							<dt class="col-sm-3">Fee:</dt>
+							<dd class="col-sm-9"><span
+									th:text="${#numbers.formatCurrency(activeMembership.fee)}"></span></dd>
+
+							<dt class="col-sm-3">Benefits:</dt>
+							<dd class="col-sm-9" th:text="${activeMembership.benefits}"></dd>
+						</dl>
+						<hr>
+						<p class="text-muted fst-italic">Thank you for being a valued member of our club!</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4">
+				<div class="card mt-4 mt-lg-0">
+					<div class="card-header bg-secondary text-white">
+						<h5 class="mb-0">Actions</h5>
+					</div>
+					<div class="card-body">
+						<p>Want to renew or upgrade your membership?</p>
+						<a href="#" class="btn btn-info w-100 mb-2 disabled">Renew Membership</a>
+						<a href="#" class="btn btn-outline-info w-100 disabled">Upgrade Membership</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div th:unless="${activeMembership != null}" class="alert alert-info mt-4" role="alert">
+			<h4 class="alert-heading">No Active Membership!</h4>
+			<p>It looks like you don't have an active membership with our club. Join today to unlock exclusive benefits!
+			</p>
+			<hr>
+			<p class="mb-0">
+				<a th:href="@{/customer/membership/join}" class="btn btn-primary"><i
+						class="fas fa-plus-circle me-1"></i> Join a Membership</a>
+				<a th:href="@{/customer/dashboard}" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i>
+					Back to Dashboard</a>
+			</p>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

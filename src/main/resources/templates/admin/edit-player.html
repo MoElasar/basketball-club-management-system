@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Edit Player</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Your existing CSS styles */
+        :root {
+            --primary-color: #1a2a6c;
+            --secondary-color: #b21f1f;
+            --accent-color: #fdbb2d;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background-color: var(--dark-gray);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: var(--primary-color);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+        }
+        
+        .player-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .img-thumbnail {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            .sidebar.collapsed {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper d-flex">
+        <!-- Sidebar (same as your original) -->
+        <div class="sidebar">
+            <!-- Your existing sidebar content -->
+        </div>
+
+        <div class="main-content w-100">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <!-- Your existing navbar content -->
+            </nav>
+
+            <div class="container-fluid py-4">
+                <h1 class="mb-4" th:text="${pageTitle}"></h1>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        Edit Player
+                    </div>
+                    <div class="card-body">
+                        <!-- IMPORTANT: Add enctype="multipart/form-data" to the form -->
+                        <form th:action="@{/admin/players/update/{id}(id=${player.playerId})}" 
+                              th:object="${player}" 
+                              method="post"
+                              enctype="multipart/form-data">
+                            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <span th:text="${error}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name:</label>
+                                    <input type="text" id="firstName" th:field="*{firstName}" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name:</label>
+                                    <input type="text" id="lastName" th:field="*{lastName}" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="dateOfBirth" class="form-label">Date of Birth:</label>
+                                    <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="position" class="form-label">Position:</label>
+                                    <select id="position" th:field="*{position}" class="form-control">
+                                        <option value="">Select Position</option>
+                                        <option th:each="pos : ${positions}" th:value="${pos}" th:text="${pos}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nationality" class="form-label">Nationality:</label>
+                                    <input type="text" id="nationality" th:field="*{nationality}" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="jerseyNumber" class="form-label">Jersey Number:</label>
+                                    <input type="number" id="jerseyNumber" th:field="*{jerseyNumber}" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="height" class="form-label">Height (cm):</label>
+                                    <input type="number" step="0.01" id="height" th:field="*{height}" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="weight" class="form-label">Weight (kg):</label>
+                                    <input type="number" step="0.01" id="weight" th:field="*{weight}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="joinDate" class="form-label">Join Date:</label>
+                                    <input type="date" id="joinDate" th:field="*{joinDate}" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="profileImageFile" class="form-label">Profile Image:</label>
+                                    <input type="file" id="profileImageFile" name="profileImageFile" class="form-control" accept="image/*">
+                                    <small class="text-muted">Upload a new profile picture (JPG, PNG, etc.)</small>
+                                    <!-- Show current image if exists -->
+                                    <div th:if="${player.profileImage}" class="mt-2">
+                                        <img th:src="${player.profileImage}" class="img-thumbnail">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" id="removeImage" name="removeImage">
+                                            <label class="form-check-label" for="removeImage">Remove current image</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="team" class="form-label">Team:</label>
+                                    <select id="team" name="teamId" class="form-control" required>
+                                        <option value="">Select Team</option>
+                                        <option th:each="team : ${teams}" th:value="${team.teamId}" th:text="${team.teamName}" 
+                                                th:selected="${player.team != null and player.team.teamId == team.teamId}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="user" class="form-label">Associated User (Optional):</label>
+                                    <select id="user" name="userId" class="form-control">
+                                        <option value="">No User</option>
+                                        <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}"
+                                                th:selected="${player.user != null and player.user.id == user.id}"></option>
+                                    </select>
+                                </div>
+								
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Player</button>
+                            <a th:href="@{/admin/players}" class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle}">Merchandise</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		:root {
+			--card-bg: #ffffff;
+			--card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+			--card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+			--primary-color: #3a86ff;
+			--text-muted: #6c757d;
+		}
+
+		body {
+			background-color: #f8f9fa;
+		}
+
+		.merchandise-card {
+			transition: all 0.3s ease;
+			border: none;
+			border-radius: 12px;
+			overflow: hidden;
+			background: var(--card-bg);
+			box-shadow: var(--card-shadow);
+		}
+
+		.merchandise-card:hover {
+			transform: translateY(-8px);
+			box-shadow: var(--card-hover-shadow);
+		}
+
+		.merchandise-img {
+			height: 220px;
+			object-fit: contain;
+			width: 100%;
+			padding: 20px;
+			background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+		}
+
+		.card-body {
+			padding: 1.5rem;
+		}
+
+		.card-title {
+			font-weight: 700;
+			color: #212529;
+			margin-bottom: 0.5rem;
+		}
+
+		.card-subtitle {
+			font-weight: 500;
+			color: var(--primary-color);
+			margin-bottom: 1rem;
+		}
+
+		.card-text {
+			color: var(--text-muted);
+			font-size: 0.9rem;
+			line-height: 1.5;
+			margin-bottom: 1.5rem;
+		}
+
+		.price-tag {
+			font-weight: 700;
+			font-size: 1.25rem;
+			color: #212529;
+		}
+
+		.stock-badge {
+			padding: 0.35em 0.65em;
+			font-size: 0.75em;
+			font-weight: 600;
+			border-radius: 50rem;
+		}
+
+		.header-section {
+			background: linear-gradient(135deg, #3a86ff 0%, #2667cc 100%);
+			color: white;
+			padding: 2rem 0;
+			margin-bottom: 2rem;
+			border-radius: 0 0 20px 20px;
+		}
+
+		.header-section h2 {
+			font-weight: 700;
+		}
+	</style>
+</head>
+
+<body>
+	<nav th:fragment="customer_navbar" class="navbar navbar-expand-lg navbar-dark bg-info">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="/customer/dashboard">Basketball Club</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+					data-bs-target="#customerNavbarContent" aria-controls="customerNavbarContent" aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="customerNavbarContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" th:href="@{/customer/dashboard}">
+								<i class="fas fa-home me-1"></i> Dashboard
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customer/tickets}">
+								<i class="fas fa-ticket-alt me-1"></i> My Tickets
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customer/merchandise}">
+								<i class="fas fa-tshirt me-1"></i> Merchandise
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customer/schedule}">
+								<i class="fas fa-calendar-alt me-1"></i> Schedule
+							</a>
+						</li>
+						
+						<li class="nav-item">
+												<a class="nav-link" th:href="@{/customer/news}">
+													<i class="fas fa-newspaper me-1"></i> News
+												</a>
+											</li>
+					</ul>
+					<ul class="navbar-nav ms-auto">
+						<li class="nav-item dropdown" th:if="${currentUser != null}">
+							<a class="nav-link dropdown-toggle" href="#" id="customerNavbarDropdown" role="button"
+								data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="fas fa-user-circle me-1"></i>
+								<span th:text="${currentUser.username}"></span>
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="customerNavbarDropdown">
+								<li><a class="dropdown-item" th:href="@{/customer/profile}">
+										<i class="fas fa-user me-1"></i> Profile
+									</a></li>
+								<li>
+									<hr class="dropdown-divider">
+								</li>
+								<li><a class="dropdown-item" th:href="@{/logout}">
+										<i class="fas fa-sign-out-alt me-1"></i> Logout
+									</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+
+
+	<div class="container mt-4">
+		<div th:if="${merchandiseList.isEmpty()}" class="alert alert-info text-center" role="alert">
+			<i class="fas fa-info-circle me-2"></i> No merchandise available at the moment. Please check back later!
+		</div>
+
+		<div class="row g-4">
+			<div class="col-md-4 col-lg-3" th:each="item : ${merchandiseList}">
+				<div class="card merchandise-card h-100">
+					<img th:src="${item.imageUrl ?: 'https://via.placeholder.com/300?text=No+Image'}"
+						class="card-img-top merchandise-img" alt="Merchandise Image">
+					<div class="card-body d-flex flex-column">
+						<h5 class="card-title" th:text="${item.itemName}">Item Name</h5>
+						<h6 class="card-subtitle mb-2" th:text="${item.category}">Category</h6>
+						<p class="card-text" th:text="${item.description}"></p>
+						<div class="mt-auto pt-2">
+							<div class="d-flex justify-content-between align-items-center">
+								<span class="price-tag"
+									th:text="${'$' + #numbers.formatDecimal(item.price, 1, 2)}">Price</span>
+								<span th:if="${item.stockQuantity > 0}" class="stock-badge bg-success">In Stock</span>
+								<span th:unless="${item.stockQuantity > 0}" class="stock-badge bg-secondary">Out of
+									Stock</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

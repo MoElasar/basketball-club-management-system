@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle}">Customer Dashboard</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		.game-card {
+			transition: transform 0.2s;
+		}
+
+		.game-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+		}
+
+		.ticket-card {
+			border-left: 4px solid #0d6efd;
+		}
+
+		.navbar {
+			margin-bottom: 20px;
+		}
+
+		.stat-card {
+			height: 100%;
+		}
+
+		.stat-icon {
+			font-size: 2.5rem;
+			margin-bottom: 1rem;
+		}
+	</style>
+</head>
+
+<body>
+	<nav th:fragment="customer_navbar" class="navbar navbar-expand-lg navbar-dark bg-info">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/customer/dashboard">Basketball Club</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#customerNavbarContent" aria-controls="customerNavbarContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="customerNavbarContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" aria-current="page" th:href="@{/customer/dashboard}">
+							<i class="fas fa-home me-1"></i> Dashboard
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/tickets}">
+							<i class="fas fa-ticket-alt me-1"></i> My Tickets
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/merchandise}">
+							<i class="fas fa-tshirt me-1"></i> Merchandise
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/schedule}">
+							<i class="fas fa-calendar-alt me-1"></i> Schedule
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/news}">
+							<i class="fas fa-newspaper me-1"></i> News
+						</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item dropdown" th:if="${currentUser != null}">
+						<a class="nav-link dropdown-toggle" href="#" id="customerNavbarDropdown" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fas fa-user-circle me-1"></i>
+							<span th:text="${currentUser.username}"></span>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="customerNavbarDropdown">
+							<li><a class="dropdown-item" th:href="@{/customer/profile}">
+									<i class="fas fa-user me-1"></i> Profile
+								</a></li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li><a class="dropdown-item" th:href="@{/logout}">
+									<i class="fas fa-sign-out-alt me-1"></i> Logout
+								</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container mt-4">
+		<div th:if="${param.success}" class="alert alert-success alert-dismissible fade show">
+			Profile updated successfully!
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+
+		<h2>Welcome, <span th:text="${customer.firstName + ' ' + customer.lastName}"></span>!</h2>
+		<p class="lead">This is your customer dashboard. Manage your tickets, view upcoming games, and update your
+			profile.</p>
+
+		<div class="row mt-4">
+			<!-- Quick Stats Cards -->
+			<div class="col-md-4 mb-3">
+				<div class="card text-center stat-card">
+					<div class="card-body">
+						<i class="fas fa-ticket-alt stat-icon text-primary"></i>
+						<h5 class="card-title">My Tickets</h5>
+						<p class="card-text">
+							<span class="fs-3" th:text="${purchases.size()}">0</span> purchases
+						</p>
+						<a th:href="@{/customer/tickets}" class="btn btn-primary">View Tickets</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-4 mb-3">
+				<div class="card text-center stat-card">
+					<div class="card-body">
+						<i class="fas fa-calendar-alt stat-icon text-success"></i>
+						<h5 class="card-title">Upcoming Games</h5>
+						<p class="card-text">
+							<span class="fs-3" th:text="${upcomingGames.size()}">0</span> games
+						</p>
+						<a href="/customer/schedule" class="btn btn-success">View Games</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-4 mb-3">
+				<div class="card text-center stat-card">
+					<div class="card-body">
+						<i class="fas fa-user-circle stat-icon text-info"></i>
+						<h5 class="card-title">My Profile</h5>
+						<p class="card-text">Update your personal information</p>
+						<a th:href="@{/customer/profile}" class="btn btn-info">Edit Profile</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Recent Purchases Section -->
+		<div class="row mt-5" th:if="${not purchases.isEmpty()}">
+			<div class="col-12">
+				<h3><i class="fas fa-history me-2"></i>Recent Purchases</h3>
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead class="table-light">
+							<tr>
+								<th>Purchase Date</th>
+								<th>Amount</th>
+								<th>Payment Method</th>
+								<th>Tickets</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="purchase : ${purchases}"
+								th:if="${#lists.size(purchases) <= 5 or #lists.indexOf(purchases, purchase) < 5}">
+								<td
+									th:text="${#temporals.format(purchase.getPurchaseDateTime(), 'MMM dd, yyyy HH:mm')}">
+								</td>
+								<td th:text="${'$' + #numbers.formatDecimal(purchase.getTotalAmount(), 1, 2)}"></td>
+								<td th:text="${purchase.getPaymentMethod()}"></td>
+								<td th:text="${#lists.size(purchase.getTickets())}"></td>
+								<td>
+									<a th:href="@{/customer/tickets/{purchaseId}(purchaseId=${purchase.purchaseId})}"
+										class="btn btn-sm btn-outline-primary">
+										<i class="fas fa-eye"></i> Details
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="text-end">
+					<a th:href="@{/customer/tickets}" class="btn btn-outline-secondary">View All Purchases</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- Upcoming Games Section -->
+		<div class="row mt-5" id="upcoming-games">
+			<div class="col-12">
+				<h3><i class="fas fa-calendar-alt me-2"></i>Upcoming Games</h3>
+				<div class="row">
+					<div class="col-md-4 mb-4" th:each="game : ${upcomingGames}">
+						<div class="card game-card h-100">
+							<div class="card-header bg-primary text-white">
+								<h5 class="card-title mb-0"
+									th:text="${#temporals.format(game.getGameDateTime(), 'EEE, MMM dd')}"></h5>
+							</div>
+							<div class="card-body">
+								<h6 class="card-subtitle mb-2 text-muted" th:text="${game.getVenue()}"></h6>
+
+								<div class="d-flex justify-content-between align-items-center mb-3">
+									<div class="text-center">
+										<span th:text="${game.homeTeam?.teamName}">Home Team</span>
+									</div>
+									<div class="text-center px-2">
+										<span class="fw-bold">VS</span>
+									</div>
+									<div class="text-center">
+										<span th:text="${game.awayTeam?.teamName}">Away Team</span>
+									</div>
+								</div>
+
+
+								<p class="card-text">
+									<i class="fas fa-clock me-2"></i>
+									<span th:text="${#temporals.format(game.getGameDateTime(), 'h:mm a')}"></span>
+								</p>
+							</div>
+							<div class="card-footer bg-transparent">
+								<a th:href="@{/customer/games/{id}(id=${game.gameId})}"
+									class="btn btn-sm btn-outline-primary">
+									<i class="fas fa-info-circle"></i> Details
+								</a>
+								<a th:href="@{/customer/tickets/game/{id}(id=${game.gameId})}"
+									class="btn btn-sm btn-primary ms-2">
+									<i class="fas fa-ticket-alt"></i> Buy Tickets
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">News Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div th:replace="~{customer/dashboard :: customer_navbar}"></div>
+
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/customer/dashboard}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/customer/news}">News</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${news.title}"></li>
+            </ol>
+        </nav>
+
+        <div class="card mb-4">
+            <img th:if="${news.imageUrl != null and !news.imageUrl.isEmpty()}" th:src="${news.imageUrl}" class="card-img-top" alt="News Image" style="max-height: 400px; object-fit: cover;">
+            <div class="card-body">
+                <h1 class="card-title mb-3" th:text="${news.title}">News Article Title</h1>
+                <p class="card-subtitle text-muted mb-3">
+                    <i class="fas fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(news.publishDate, 'MMMM dd, yyyy')}"></span>
+                    <span th:if="${news.author != null and !news.author.isEmpty()}">
+                        | <i class="fas fa-user me-1"></i> <span th:text="${news.author}"></span>
+                    </span>
+                    <span th:if="${news.category != null}">
+                        | <span class="badge bg-info text-dark" th:text="${news.category.displayName}">Category</span>
+                    </span>
+                </p>
+                <hr>
+                <div class="card-text" th:utext="${news.content}">
+                    </div>
+            </div>
+            <div class="card-footer text-end">
+                <a th:href="@{/customer/news}" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i> Back to News</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

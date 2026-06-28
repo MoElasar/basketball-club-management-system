@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle} + ' - Basketball Club Admin'">Player Statistics - Basketball Club Admin</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		/* Your CSS styles from the original HTML go here */
+		:root {
+			--primary-color: #1a2a6c;
+			--secondary-color: #b21f1f;
+			--accent-color: #fdbb2d;
+			--light-gray: #f8f9fa;
+			--dark-gray: #343a40;
+		}
+
+		body {
+			background-color: var(--light-gray);
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		.sidebar {
+			min-height: 100vh;
+			background-color: var(--dark-gray);
+			color: white;
+			transition: all 0.3s;
+		}
+
+		.sidebar .nav-link {
+			color: rgba(255, 255, 255, 0.8);
+			padding: 0.75rem 1rem;
+			margin-bottom: 0.2rem;
+		}
+
+		.sidebar .nav-link:hover {
+			color: white;
+			background-color: rgba(255, 255, 255, 0.1);
+		}
+
+		.sidebar .nav-link.active {
+			color: white;
+			background-color: var(--primary-color);
+		}
+
+		.sidebar .nav-link i {
+			margin-right: 0.5rem;
+		}
+
+		.main-content {
+			padding: 20px;
+		}
+
+		.card {
+			border: none;
+			border-radius: 10px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s;
+		}
+
+		.card:hover {
+			transform: translateY(-5px);
+		}
+
+		.navbar-brand {
+			font-weight: 700;
+		}
+
+		/* Optional: Adjust for smaller screens if sidebar collapses */
+		@media (max-width: 768px) {
+			.sidebar {
+				margin-left: -250px;
+				/* Hide sidebar by default on smaller screens */
+			}
+
+			.sidebar.collapsed {
+				margin-left: 0;
+				/* Show sidebar when toggled */
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="wrapper d-flex">
+		<div class="sidebar">
+			<div class="px-3 py-4">
+				<h4 class="text-center mb-4">Basketball Club</h4>
+				<hr class="my-2 bg-light">
+				<ul class="nav flex-column">
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/dashboard}">
+							<i class="fas fa-tachometer-alt"></i> Dashboard
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/users}">
+							<i class="fas fa-users"></i> User Management
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/team}">
+							<i class="fas fa-users"></i> Team Management
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/players}">
+							<i class="fas fa-running"></i> Player Management
+						</a>
+					</li>
+					 
+
+
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/staff}">
+							<i class="fas fa-user-tie"></i> Staff Management
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/games}">
+							<i class="fas fa-basketball-ball"></i> Game Management
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/facilities}">
+							<i class="fas fa-building"></i> Facility Management
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/tickets}">
+							<i class="fas fa-ticket-alt"></i> Ticket Management
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/admin/merchandise}">
+							<i class="fas fa-tshirt"></i> Merchandise
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="main-content w-100">
+			<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+				<div class="container-fluid">
+					<button class="btn btn-dark" id="sidebarToggle">
+						<i class="fas fa-bars"></i>
+					</button>
+					<div class="navbar-collapse">
+						<ul class="navbar-nav ms-auto">
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+									data-bs-toggle="dropdown" aria-expanded="false">
+									<i class="fas fa-user-circle me-1"></i>
+									<span th:text="${currentUser != null ? currentUser.username : 'Admin'}">Admin</span>
+								</a>
+								<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a>
+									</li>
+									<li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Settings</a>
+									</li>
+									<li>
+										<hr class="dropdown-divider">
+									</li>
+									<li><a class="dropdown-item" th:href="@{/logout}"><i
+												class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+
+			<div class="container-fluid py-4">
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<h1 th:text="${pageTitle}">Player Statistics</h1>
+					<a th:href="@{/admin/players}" class="btn btn-secondary">
+						<i class="fas fa-arrow-left me-1"></i> Back to Players
+					</a>
+				</div>
+
+				<div class="card mb-4">
+					<div class="card-header bg-white">
+						Season Summary for <span th:text="${player.firstName + ' ' + player.lastName}"></span>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+										<th>Games Played</th>
+										<th>Points</th>
+										<th>Rebounds</th>
+										<th>Assists</th>
+										<th>Steals</th>
+										<th>Blocks</th>
+										<th>FG%</th>
+										<th>3P%</th>
+										<th>FT%</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td th:text="${statistics.size()}"></td>
+										<td th:text="${seasonStats.points}"></td>
+										<td th:text="${seasonStats.rebounds}"></td>
+										<td th:text="${seasonStats.assists}"></td>
+										<td th:text="${seasonStats.steals}"></td>
+										<td th:text="${seasonStats.blocks}"></td>
+										<td
+											th:text="${seasonStats.fieldGoalsAttempted > 0 ? 
+                                                 #numbers.formatDecimal(seasonStats.fieldGoalsMade / seasonStats.fieldGoalsAttempted * 100, 1, 2, 'POINT') + '%' : '0%'}">
+										</td>
+										<td
+											th:text="${seasonStats.threePointsAttempted > 0 ? 
+                                                 #numbers.formatDecimal(seasonStats.threePointsMade / seasonStats.threePointsAttempted * 100, 1, 2, 'POINT') + '%' : '0%'}">
+										</td>
+										<td
+											th:text="${seasonStats.freeThrowsAttempted > 0 ? 
+                                                 #numbers.formatDecimal(seasonStats.freeThrowsMade / seasonStats.freeThrowsAttempted * 100, 1, 2, 'POINT') + '%' : '0%'}">
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="card">
+					<div class="card-header bg-white d-flex justify-content-between align-items-center">
+						<span>Game-by-Game Statistics</span>
+						<button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addStatModal">
+							<i class="fas fa-plus me-1"></i> Add New Statistic
+						</button>
+					</div>
+					<div class="card-body">
+						<div th:if="${param.success}" class="alert alert-success alert-dismissible fade show"
+							role="alert">
+							<span th:text="${param.success == 'add' ? 'Statistic added successfully!' : 
+                                             param.success == 'update' ? 'Statistic updated successfully!' : 
+                                             'Statistic deleted successfully!'}"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+						</div>
+
+						<div class="table-responsive">
+							<table class="table table-striped table-hover">
+								<thead>
+									<tr>
+										<th>Game</th>
+										<th>Date</th>
+										<th>Points</th>
+										<th>Reb</th>
+										<th>Ast</th>
+										<th>Stl</th>
+										<th>Blk</th>
+										<th>FG</th>
+										<th>3P</th>
+										<th>FT</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="stat : ${statistics}">
+										<td
+											th:text="${stat.game != null ? stat.game.homeTeam.teamName + ' vs ' + stat.game.awayTeam.teamName : 'N/A'}">
+										</td>
+
+										<td
+											th:text="${stat.game != null and stat.game.gameDateTime != null ? #temporals.format(stat.game.gameDateTime, 'yyyy-MM-dd HH:mm') : 'N/A'}">
+										</td>
+										<td th:text="${stat.points}"></td>
+										<td th:text="${stat.rebounds}"></td>
+										<td th:text="${stat.assists}"></td>
+										<td th:text="${stat.steals}"></td>
+										<td th:text="${stat.blocks}"></td>
+										<td><span th:text="${stat.fieldGoalsMade}"></span>/<span
+												th:text="${stat.fieldGoalsAttempted}"></span></td>
+										<td><span th:text="${stat.threePointsMade}"></span>/<span
+												th:text="${stat.threePointsAttempted}"></span></td>
+										<td><span th:text="${stat.freeThrowsMade}"></span>/<span
+												th:text="${stat.freeThrowsAttempted}"></span></td>
+										<td>
+											<a th:href="@{/admin/players/statistics/edit/{statId}(statId=${stat.statId})}"
+												class="btn btn-sm btn-info me-2">
+												<i class="fas fa-edit"></i> Edit
+											</a>
+											<a th:href="@{/admin/players/statistics/delete/{statId}(statId=${stat.statId})}"
+												class="btn btn-sm btn-danger"
+												onclick="return confirm('Are you sure you want to delete this statistic?');">
+												<i class="fas fa-trash-alt"></i> Delete
+											</a>
+										</td>
+									</tr>
+									<tr th:if="${statistics.empty}">
+										<td colspan="11" class="text-center">No game statistics found for this player.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="addStatModal" tabindex="-1" aria-labelledby="addStatModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="addStatModalLabel">Add New Statistic for <span
+							th:text="${player.firstName + ' ' + player.lastName}"></span></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form th:action="@{/admin/players/statistics/add/{playerId}(playerId=${player.playerId})}"
+					th:object="${newStat}" method="post">
+					<div class="modal-body">
+						<div class="mb-3">
+							<label for="gameId" class="form-label">Game (select if applicable):</label>
+							<select id="gameId" name="game.gameId" class="form-control">
+								<option value="" disabled selected>Select Game</option>
+								<option th:each="game : ${allGames}" th:value="${game.gameId}"
+									th:text="${game.homeTeam.teamName + ' vs ' + game.awayTeam.teamName + ' - ' + #temporals.format(game.gameDateTime, 'yyyy-MM-dd HH:mm')}">
+								</option>
+							</select>
+
+
+							<small class="form-text text-muted">Note: Ensure your controller correctly handles setting
+								the Game object if selected.</small>
+						</div>
+
+						<div class="row">
+							<div class="col-md-4 mb-3">
+								<label for="points" class="form-label">Points</label>
+								<input type="number" id="points" th:field="*{points}" class="form-control" value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="rebounds" class="form-label">Rebounds</label>
+								<input type="number" id="rebounds" th:field="*{rebounds}" class="form-control"
+									value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="assists" class="form-label">Assists</label>
+								<input type="number" id="assists" th:field="*{assists}" class="form-control" value="0">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4 mb-3">
+								<label for="steals" class="form-label">Steals</label>
+								<input type="number" id="steals" th:field="*{steals}" class="form-control" value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="blocks" class="form-label">Blocks</label>
+								<input type="number" id="blocks" th:field="*{blocks}" class="form-control" value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="turnovers" class="form-label">Turnovers</label>
+								<input type="number" id="turnovers" th:field="*{turnovers}" class="form-control"
+									value="0">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4 mb-3">
+								<label for="fouls" class="form-label">Fouls</label>
+								<input type="number" id="fouls" th:field="*{fouls}" class="form-control" value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="minutesPlayed" class="form-label">Minutes Played</label>
+								<input type="number" id="minutesPlayed" th:field="*{minutesPlayed}" class="form-control"
+									value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="fieldGoalsAttempted" class="form-label">FG Attempted</label>
+								<input type="number" id="fieldGoalsAttempted" th:field="*{fieldGoalsAttempted}"
+									class="form-control" value="0">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-4 mb-3">
+								<label for="fieldGoalsMade" class="form-label">FG Made</label>
+								<input type="number" id="fieldGoalsMade" th:field="*{fieldGoalsMade}"
+									class="form-control" value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="threePointsAttempted" class="form-label">3P Attempted</label>
+								<input type="number" id="threePointsAttempted" th:field="*{threePointsAttempted}"
+									class="form-control" value="0">
+							</div>
+							<div class="col-md-4 mb-3">
+								<label for="threePointsMade" class="form-label">3P Made</label>
+								<input type="number" id="threePointsMade" th:field="*{threePointsMade}"
+									class="form-control" value="0">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label for="freeThrowsAttempted" class="form-label">FT Attempted</label>
+								<input type="number" id="freeThrowsAttempted" th:field="*{freeThrowsAttempted}"
+									class="form-control" value="0">
+							</div>
+							<div class="col-md-6 mb-3">
+								<label for="freeThrowsMade" class="form-label">FT Made</label>
+								<input type="number" id="freeThrowsMade" th:field="*{freeThrowsMade}"
+									class="form-control" value="0">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Add Statistic</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		document.getElementById('sidebarToggle').addEventListener('click', function () {
+			document.querySelector('.sidebar').classList.toggle('collapsed');
+		});
+	</script>
+</body>
+
+</html>

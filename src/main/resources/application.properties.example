@@ -1,0 +1,55 @@
+#server.port=8080
+
+# DataSource Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/bms_db
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# Thymeleaf Configuration
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+
+ 
+
+ 
+# Enable file uploads
+spring.servlet.multipart.enabled=true
+ 
+
+# File upload configuration
+upload.path=./uploads/profile-images
+ 
+# JWT Configuration
+app.jwtSecret=${JWT_SECRET:your-long-random-secret-here}
+# 24 hours in milliseconds
+app.jwtExpirationMs=86400000
+
+spring.jackson.serialization.fail-on-empty-beans=false
+spring.jackson.serialization.write-dates-as-timestamps=false
+
+# File upload configuration (updated with larger sizes)
+
+spring.servlet.multipart.file-size-threshold=200MB
+
+# File storage locations
+ 
+file.upload.dir=./uploads  # Or your desired upload directory (relative or absolute)
+application.server.base-url=http://localhost:8080 # Or your server's base URL
+ 
+
+
+# File upload configuration
+file.upload-dir=uploads/profile-images
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+
+# Enable file serving
+spring.mvc.static-path-pattern=/api/files/**
+spring.web.resources.static-locations=file:${file.upload-dir}
+
+#spring.resources.static-locations=classpath:/static/,classpath:/custom-static/

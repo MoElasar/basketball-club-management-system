@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle}">Player Details</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+	<style>
+		:root {
+			--primary-color: #2c3e50;
+			--secondary-color: #3498db;
+			--accent-color: #e74c3c;
+			--light-color: #ecf0f1;
+			--dark-color: #2c3e50;
+			--success-color: #27ae60;
+			--warning-color: #f39c12;
+			--danger-color: #e74c3c;
+		}
+
+		body {
+			background-color: #f5f7fa;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		.navbar {
+			background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+
+		.navbar-brand {
+			font-weight: 700;
+			letter-spacing: 1px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<nav th:replace="~{fragments/staff_navbar :: staff_navbar}"></nav>
+
+	<div class="container mt-4">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2 th:text="${pageTitle}">Player Details</h2>
+			<a th:href="@{/staff/players}" class="btn btn-secondary">
+				<i class="fas fa-arrow-left"></i> Back to Team Players
+			</a>
+		</div>
+
+		<div class="card">
+			<div class="card-header bg-primary text-white">
+				<h5 class="mb-0">Player Information</h5>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-4 text-center">
+						<img th:if="${player.profileImage != null and !player.profileImage.isEmpty()}"
+							th:src="@{${player.profileImage}}" alt="Player Profile Image"
+							class="player-profile-img mb-3">
+						<img th:unless="${player.profileImage != null and !player.profileImage.isEmpty()}"
+							th:src="@{/images/default-player.png}" alt="Default Profile Image"
+							class="player-profile-img mb-3">
+						<h4 th:text="${player.firstName + ' ' + player.lastName}">Player Name</h4>
+						<p class="text-muted" th:text="${player.position}"></p>
+					</div>
+					<div class="col-md-8">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item"><strong>Jersey Number:</strong> <span
+									th:text="${player.jerseyNumber}"></span></li>
+							<li class="list-group-item"><strong>Nationality:</strong> <span
+									th:text="${player.nationality}"></span></li>
+							<li class="list-group-item"><strong>Date of Birth:</strong> <span
+									th:text="${#temporals.format(player.dateOfBirth, 'dd MMMM yyyy')}"></span></li>
+							<li class="list-group-item"><strong>Height:</strong> <span
+									th:text="${player.height + ' cm'}"></span></li>
+							<li class="list-group-item"><strong>Weight:</strong> <span
+									th:text="${player.weight + ' kg'}"></span></li>
+							<li class="list-group-item"><strong>Join Date:</strong> <span
+									th:text="${#temporals.format(player.joinDate, 'dd MMMM yyyy')}"></span></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

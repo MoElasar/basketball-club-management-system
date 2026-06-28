@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle}">Game Details</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+	<nav th:fragment="customer_navbar" class="navbar navbar-expand-lg navbar-dark bg-info">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/customer/dashboard">Basketball Club</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#customerNavbarContent" aria-controls="customerNavbarContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="customerNavbarContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" aria-current="page" th:href="@{/customer/dashboard}">
+							<i class="fas fa-home me-1"></i> Dashboard
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/tickets}">
+							<i class="fas fa-ticket-alt me-1"></i> My Tickets
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/merchandise}">
+							<i class="fas fa-tshirt me-1"></i> Merchandise
+						</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/schedule}">
+							<i class="fas fa-calendar-alt me-1"></i> Schedule
+						</a>
+					</li>
+
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/customer/news}">
+							<i class="fas fa-newspaper me-1"></i> News
+						</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item dropdown" th:if="${currentUser != null}">
+						<a class="nav-link dropdown-toggle" href="#" id="customerNavbarDropdown" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fas fa-user-circle me-1"></i>
+							<span th:text="${currentUser.username}"></span>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="customerNavbarDropdown">
+							<li><a class="dropdown-item" th:href="@{/customer/profile}">
+									<i class="fas fa-user me-1"></i> Profile
+								</a></li>
+							<li>
+								<hr class="dropdown-divider">
+							</li>
+							<li><a class="dropdown-item" th:href="@{/logout}">
+									<i class="fas fa-sign-out-alt me-1"></i> Logout
+								</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+	<div class="container mt-4">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2><i class="fas fa-basketball-ball me-2"></i>Game Details</h2>
+			<a th:href="@{/customer/dashboard}" class="btn btn-outline-secondary">
+				<i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+			</a>
+		</div>
+
+		<div class="card mb-4">
+			<div class="card-header bg-primary text-white">
+				<!-- <h3 class="mb-0 text-center" th:text="${game.homeTeam.name + ' vs ' + game.awayTeam.name}"></h3>-->
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-md-6 text-center">
+						<img th:src="@{'/images/team-logos/' + ${game.homeTeam.teamId} + '.png'}" alt="Home Team"
+							width="100" class="img-fluid mb-3">
+						<h4 th:text="${game.homeTeam.teamName}"></h4>
+					</div>
+					<div class="col-md-6 text-center">
+						<img th:src="@{'/images/team-logos/' + ${game.awayTeam.teamId} + '.png'}" alt="Away Team"
+							width="100" class="img-fluid mb-3">
+						<h4 th:text="${game.awayTeam.teamName}"></h4>
+					</div>
+				</div>
+
+
+				<div class="row mt-4">
+					<div class="col-md-6">
+						<p><strong>Date & Time:</strong>
+							<span th:text="${#temporals.format(game.gameDateTime, 'EEE, MMM dd, yyyy h:mm a')}"></span>
+						</p>
+						<p><strong>Venue:</strong> <span th:text="${game.venue}"></span></p>
+						<p><strong>Status:</strong> <span th:text="${game.status}"></span></p>
+					</div>
+					<div class="col-md-6">
+						<div th:if="${game.homeScore != null and game.awayScore != null}">
+							<p><strong>Score:</strong>
+								<span th:text="${game.homeScore + ' - ' + game.awayScore}"></span>
+							</p>
+						</div>
+						<a th:href="@{/customer/tickets/game/{id}(id=${game.gameId})}" class="btn btn-primary mt-3">
+							<i class="fas fa-ticket-alt me-1"></i> Buy Tickets
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

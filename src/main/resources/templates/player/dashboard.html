@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Player Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom navbar styling for player portal */
+        .navbar-player {
+            background-color: #003366;
+            /* Dark blue background */
+            color: #ffffff;
+        }
+
+        .navbar-player .navbar-brand {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .navbar-player .navbar-brand img {
+            height: 30px;
+            /* Adjust as needed */
+        }
+
+        .navbar-player .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+            /* Lighter color for non-active links */
+        }
+
+        .navbar-player .nav-link:hover,
+        .navbar-player .nav-link.active {
+            color: #ffffff;
+            /* White for active/hover links */
+        }
+
+        .navbar-player .dropdown-menu {
+            background-color: #004080;
+            /* Slightly lighter dark blue for dropdown */
+            border: none;
+        }
+
+        .navbar-player .dropdown-item {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .navbar-player .dropdown-item:hover {
+            background-color: #0050a0;
+            /* Even lighter blue on hover */
+            color: #ffffff;
+        }
+
+        .navbar-player .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+
+        .player-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            border-left: 4px solid #0d6efd;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-card {
+            border-left: 4 света#198754;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-player mb-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" th:href="@{/player/dashboard}">
+                <img th:src="@{/images/logo-white.png}" alt="League Logo" class="me-2">
+                <span>Player Portal</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#playerNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="playerNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/player/dashboard}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/player/schedule}">
+                            <i class="fas fa-calendar-alt me-1"></i> Schedule
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/player/stats}">
+                            <i class="fas fa-chart-line me-1"></i> Stats
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/player/team}">
+                            <i class="fas fa-users me-1"></i> Team
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container mt-4">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${param.alreadyExists}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            Your player profile already exists.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+
+        <div class="card mb-4 player-card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                        <img th:src="@{${player.profileImage != null ? player.profileImage : '/images/default-player.png'}}"
+                            alt="Player Image" class="profile-img">
+                    </div>
+                    <div class="col-md-10">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 th:text="${player.firstName + ' ' + player.lastName}"></h2>
+                                <h5>
+                                    <span th:text="${player.team != null ? player.team.teamName : 'No Team'}"></span> |
+                                    #<span th:text="${player.jerseyNumber}"></span> |
+                                    <span th:text="${player.position}"></span>
+                                </h5>
+
+                            </div>
+                            <div class="text-end">
+                                <a th:href="@{/player/profile}" class="btn btn-light">
+                                    <i class="fas fa-edit me-1"></i> Edit Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card text-center h-100 stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-basketball-ball fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Season Points</h5>
+                        <p class="card-text display-4" th:text="${seasonStats != null ? seasonStats.points : '0'}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center h-100 stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-bullseye fa-3x mb-3 text-success"></i>
+                        <h5 class="card-title">Field Goal %</h5>
+                        <p class="card-text display-4"
+                            th:text="${seasonStats != null && seasonStats.fieldGoalsAttempted > 0 ?
+                                       #numbers.formatDecimal((seasonStats.fieldGoalsMade * 100.0 / seasonStats.fieldGoalsAttempted), 1, 1) + '%' : '0%'}">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center h-100 stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-star fa-3x mb-3 text-warning"></i>
+                        <h5 class="card-title">Player Rating</h5>
+                        <p class="card-text display-4">N/A</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Games</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${not upcomingGames.isEmpty()}">
+                            <div class="list-group">
+                                <div th:each="game : ${upcomingGames}" class="list-group-item game-card">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 th:text="${game.homeTeam?.teamName + ' vs ' + game.awayTeam?.teamName}">
+                                            </h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-day me-1"></i>
+                                                <span
+                                                    th:text="${#temporals.format(game.gameDateTime, 'EEE, MMM dd')}"></span>
+                                                |
+                                                <i class="fas fa-clock me-1"></i>
+                                                <span
+                                                    th:text="${#temporals.format(game.gameDateTime, 'h:mm a')}"></span>
+                                            </small>
+                                        </div>
+                                        <a th:href="@{/player/game/{id}(id=${game.gameId})}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-end">
+                                <a th:href="@{/player/schedule}" class="btn btn-outline-primary">View Full Schedule</a>
+                            </div>
+                        </div>
+                        <div th:if="${upcomingGames.isEmpty()}" class="alert alert-info">
+                            No upcoming games scheduled.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Recent Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${not recentStats.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Game</th>
+                                            <th>PTS</th>
+                                            <th>REB</th>
+                                            <th>AST</th>
+                                            <th>FG%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="stat : ${recentStats}">
+                                            <td>
+                                                <small
+                                                    th:text="${stat.game.homeTeam?.teamName + ' vs ' + stat.game.awayTeam?.teamName}"></small>
+                                            </td>
+                                            <td th:text="${stat.points}"></td>
+                                            <td th:text="${stat.rebounds}"></td>
+                                            <td th:text="${stat.assists}"></td>
+                                            <td
+                                                th:text="${stat.fieldGoalsAttempted > 0 ?
+                                                #numbers.formatDecimal((stat.fieldGoalsMade * 100.0 / stat.fieldGoalsAttempted), 1, 1) + '%' : '0%'}">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-end">
+                                <a th:href="@{/player/stats}" class="btn btn-outline-primary">View All Stats</a>
+                            </div>
+                        </div>
+                        <div th:if="${recentStats.isEmpty()}" class="alert alert-info">
+                            No recent game statistics available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Team Performance</h5>
+                    <a th:href="@{/player/team}" class="btn btn-sm btn-light">View Team</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div th:if="${player.team != null}">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <h6>Current Record</h6>
+                            <h3 th:text="${player.team?.totalWins != null && player.team?.totalLosses != null ? (player.team.totalWins + '-' + player.team.totalLosses) : 'N/A'}"></h3>
+                            <small class="text-muted" th:text="${player.team?.conferenceStanding != null ? player.team.conferenceStanding + ' in Conference' : ''}"></small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6>Home Record</h6>
+                            <h3 th:text="${player.team?.homeWins != null && player.team?.homeLosses != null ? (player.team.homeWins + '-' + player.team.homeLosses) : 'N/A'}"></h3>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6>Away Record</h6>
+                            <h3 th:text="${player.team?.awayWins != null && player.team?.awayLosses != null ? (player.team.awayWins + '-' + player.team.awayLosses) : 'N/A'}"></h3>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${player.team != null}" class="alert alert-info mb-0">
+                    You are currently not assigned to a team. Team performance data is not available.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

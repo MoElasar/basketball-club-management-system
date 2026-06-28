@@ -1,0 +1,33 @@
+# Compiled output
+target/
+build/
+*.class
+
+# Maven
+!.mvn/wrapper/maven-wrapper.jar
+
+# Runtime upload data (not source)
+uploads/
+!uploads/.gitkeep
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.vscode/
+.apt_generated/
+.factorypath
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Local env / secrets
+.env

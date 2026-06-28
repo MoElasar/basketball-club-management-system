@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">New Injury Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav th:replace="~{fragments/staff_navbar :: staff_navbar}"></nav>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0" th:text="${pageTitle}">New Injury Report</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/staff/injuries/save}" th:object="${injury}" method="post">
+					<div class="mb-3">
+					    <label for="player" class="form-label">Player</label>
+					    <select name="player.playerId" class="form-select" id="player" required>
+					        <option value="">Select a player</option>
+					        <option th:each="player : ${teamPlayers}" 
+					                th:value="${player.playerId}"
+					                th:text="${player.firstName + ' ' + player.lastName}">
+					        </option>
+					    </select>
+					</div>
+                    
+                    <div class="mb-3">
+                        <label for="injuryType" class="form-label">Injury Type</label>
+                        <input type="text" class="form-control" th:field="*{injuryType}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="injuryDate" class="form-label">Injury Date</label>
+                        <input type="date" class="form-control" th:field="*{injuryDate}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="expectedRecoveryDate" class="form-label">Expected Recovery Date</label>
+                        <input type="date" class="form-control" th:field="*{expectedRecoveryDate}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select th:field="*{status}" class="form-select" required>
+                            <option th:each="status : ${injuryStatuses}" 
+                                    th:value="${status}"
+                                    th:text="${status}">
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="treatmentPlan" class="form-label">Treatment Plan</label>
+                        <textarea class="form-control" th:field="*{treatmentPlan}" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" th:field="*{notes}" rows="3"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Injury Report</button>
+                    <a th:href="@{/staff/injuries}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

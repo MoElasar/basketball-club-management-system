@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle}">Player Injuries</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+	<style>
+		/* Custom CSS for a cooler look, similar to profile page */
+		:root {
+			--primary-color: #2c3e50;
+			/* Dark Blue */
+			--secondary-color: #3498db;
+			/* Bright Blue */
+			--accent-color: #e74c3c;
+			/* Red */
+			--light-color: #ecf0f1;
+			/* Light Gray */
+			--dark-color: #212529;
+			/* Black/Dark Gray for text */
+			--success-color: #27ae60;
+			/* Green */
+			--warning-color: #f39c12;
+			/* Orange */
+			--danger-color: #e74c3c;
+			/* Red */
+			--info-color: #17a2b8;
+			/* Teal */
+		}
+
+		body {
+			background-color: var(--light-color);
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			color: var(--dark-color);
+		}
+
+		.navbar {
+			background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+
+		.navbar-brand {
+			font-weight: 700;
+			letter-spacing: 1px;
+		}
+
+
+		/* Card specific styling */
+		.card {
+			border: none;
+			border-radius: 12px;
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+			transition: transform 0.2s ease-in-out;
+		}
+
+		.card:hover {
+			transform: translateY(-5px);
+		}
+
+		.card-header {
+			background: linear-gradient(45deg, var(--warning-color), #d18d0f);
+			/* Orange gradient for warning */
+			border-top-left-radius: 12px;
+			border-top-right-radius: 12px;
+			color: #fff;
+			padding: 1.25rem;
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+
+		/* Table specific styling */
+		.table th {
+			background-color: var(--light-color);
+			/* Light background for table headers */
+			color: var(--primary-color);
+			font-weight: 600;
+			border-bottom: 2px solid var(--secondary-color);
+			/* Distinct bottom border */
+		}
+
+		.table tbody tr:hover {
+			background-color: rgba(52, 152, 219, 0.1);
+			/* Light blue hover for rows */
+		}
+
+		.table td {
+			vertical-align: middle;
+			padding: 1rem 0.75rem;
+			/* More padding for cells */
+		}
+
+		/* Status Badges */
+		.badge-custom {
+			padding: 0.5em 0.8em;
+			border-radius: 0.375rem;
+			font-weight: 600;
+			font-size: 0.85em;
+		}
+
+		.badge.bg-danger {
+			background-color: var(--danger-color) !important;
+		}
+
+		.badge.bg-warning {
+			background-color: var(--warning-color) !important;
+		}
+
+		.badge.bg-success {
+			background-color: var(--success-color) !important;
+		}
+
+		/* Empty state styling */
+		.empty-state {
+			padding: 4rem 2rem;
+			color: #6c757d;
+		}
+
+		.empty-state i {
+			color: #ced4da;
+			/* Lighter icon color */
+		}
+	</style>
+</head>
+
+<body>
+	<nav th:replace="~{fragments/staff_navbar :: staff_navbar}"></nav>
+
+	<div class="container mt-5">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2 th:text="${pageTitle}" class="text-dark">Player Injuries</h2>
+            <div>
+                <a th:href="@{/staff/injuries/new}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Add New Injury
+                </a>
+            </div>
+		</div>
+
+		<div class="card">
+			<div class="card-header">
+				<h5 class="mb-0"><i class="fas fa-notes-medical me-2"></i> Injury Reports Overview</h5>
+			</div>
+			<div class="card-body">
+				<div th:if="${injuries.isEmpty()}" class="text-center py-4 empty-state">
+					<i class="fas fa-heartbeat fa-5x mb-3"></i>
+					<h5 class="mt-3">No injury reports found</h5>
+					<p class="text-success fs-5">All players are currently healthy and ready to play!</p>
+				</div>
+
+				<div th:unless="${injuries.isEmpty()}" class="table-responsive">
+					<table class="table table-hover align-middle">
+						<thead>
+							<tr>
+								<th>Player</th>
+								<th>Injury Type</th>
+								<th>Injury Date</th>
+								<th>Expected Recovery</th>
+								<th>Status</th>
+								<th class="text-center">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="injury : ${injuries}">
+								<td><strong
+										th:text="${injury.player.firstName + ' ' + injury.player.lastName}"></strong>
+								</td>
+								<td th:text="${injury.injuryType}"></td>
+								<td th:text="${#temporals.format(injury.injuryDate, 'MMM dd, yyyy')}"></td>
+								<td
+									th:text="${injury.expectedRecoveryDate != null} ? 
+                                             ${#temporals.format(injury.expectedRecoveryDate, 'MMM dd, yyyy')} : 'TBD'">
+								</td>
+								<td>
+									<span th:switch="${injury.status}" class="badge badge-custom">
+										<span th:case="ACTIVE" class="bg-danger">Active</span>
+										<span th:case="RECOVERING" class="bg-warning">Recovering</span>
+										<span th:case="RECOVERED" class="bg-success">Recovered</span>
+										<span th:case="*" class="bg-secondary">Unknown</span> </span>
+								</td>
+								<td class="text-center">
+									<a th:href="@{'/staff/injuries/' + ${injury.injuryId}}"
+										class="btn btn-sm btn-outline-warning">
+										<i class="fas fa-file-medical"></i> Details
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

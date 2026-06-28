@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Create Player Profile</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		.card {
+			box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+			border-radius: 8px;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-8">
+				<div class="card">
+					<div class="card-header bg-primary text-white text-center">
+						<h4>Create Your Player Profile</h4>
+					</div>
+					<div class="card-body">
+
+						<!-- Error Message -->
+						<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+						<form th:action="@{/player/create-profile}" th:object="${player}" method="post" enctype="multipart/form-data">
+							<div class="row mb-3">
+								<div class="col">
+									<label for="firstName" class="form-label">First Name</label>
+									<input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+								</div>
+								<div class="col">
+									<label for="lastName" class="form-label">Last Name</label>
+									<input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label for="dateOfBirth" class="form-label">Date of Birth</label>
+								<input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+							</div>
+
+							<div class="mb-3">
+								<label for="position" class="form-label">Position</label>
+								<select class="form-select" id="position" th:field="*{position}" required>
+									<option th:each="pos : ${T(com.learning.main.enm.Position).values()}" th:value="${pos}" th:text="${pos}"></option>
+								</select>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col">
+									<label for="jerseyNumber" class="form-label">Jersey Number</label>
+									<input type="number" class="form-control" id="jerseyNumber" th:field="*{jerseyNumber}" required>
+								</div>
+								<div class="col">
+									<label for="nationality" class="form-label">Nationality</label>
+									<input type="text" class="form-control" id="nationality" th:field="*{nationality}" required>
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col">
+									<label for="height" class="form-label">Height (cm)</label>
+									<input type="number" step="0.1" class="form-control" id="height" th:field="*{height}" required>
+								</div>
+								<div class="col">
+									<label for="weight" class="form-label">Weight (kg)</label>
+									<input type="number" step="0.1" class="form-control" id="weight" th:field="*{weight}" required>
+								</div>
+							</div>
+
+							<div class="mb-3">
+								<label for="profileImage" class="form-label">Profile Image (optional)</label>
+								<input type="file" class="form-control" id="profileImage" name="imageFile">
+							</div>
+
+							<div class="text-end">
+								<button type="submit" class="btn btn-primary">
+									<i class="fas fa-save me-1"></i> Save Profile
+								</button>
+								<a th:href="@{/player/dashboard}" class="btn btn-secondary ms-2">Cancel</a>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
